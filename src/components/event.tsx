@@ -1,7 +1,6 @@
 import { COLOR_USAGES } from '../constant/COLOR_USAGES';
 import { AppBooking } from '../services/OfficeRnDTypes/Booking';
 import React, { useEffect, useRef } from 'react';
-import { useInterval } from '../misc/realTime';
 
 export default function Event({ event, scrollYes = false, delay = false}: { event: AppBooking, scrollYes: boolean; delay: boolean}) {
   const style = getEventStyle(event);
@@ -11,7 +10,8 @@ export default function Event({ event, scrollYes = false, delay = false}: { even
   const scrollFuntion = () => {
     messageRef.current?.scrollIntoView({
       behavior: "smooth",
-      block: 'end',
+      block: 'center',
+      inline: 'nearest'
     });
   };
   const dataToShow = event.summary
@@ -26,15 +26,13 @@ export default function Event({ event, scrollYes = false, delay = false}: { even
 
   useEffect(() => {
     if (delay) {
-      setTimeout(()=>{
+      setInterval(()=>{
         if (scrollYes == true) {
-          console.log('Scroll Yes '+ dataToShow.title)
           scrollFuntion();
         }
-       }, 3000)
+       }, 12000)
     } else {
         if (scrollYes == true) {
-          console.log('Scroll Yes with Delay '+ dataToShow.title)
           scrollFuntion();
         }
     }
@@ -81,15 +79,14 @@ function EventTimeComponent({ start, end }: { start: Date; end: Date; }) {
 const formatTime = (date: Date | number) => {
   return new Intl.DateTimeFormat('en-US', {
     timeStyle: 'short',
-    // timeZone: 'Australia/Sydney',
   }).format(date);
 };
 
 const getEventStyle = (event: AppBooking) => {
   // Default to Floor 1 if nothing is found
-  // if (event.floor === undefined) {
-  //   return { backgroundColor: COLOR_USAGES.FLOOR_1 };
-  // }
+  if (event.floor === undefined) {
+    return { backgroundColor: COLOR_USAGES.FLOOR_1 };
+  }
   if (event.floor.includes('1')) {
     return { backgroundColor: COLOR_USAGES.FLOOR_1 };
   }
