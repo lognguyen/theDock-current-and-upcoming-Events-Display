@@ -25,11 +25,10 @@ export class OfficeRnDService {
         return response.json();
       }
       return response.text().then(text => { throw new Error(text); });
-    })
-      .catch(error => {
-        console.log('Error Fetching Data: ', error);
-      }
-      );
+    }).catch(error => {
+      console.log('Error Fetching Data: ', error);
+    }
+    );
     const answer: { access_token: string; } = await fetchedData;
     this.access_token = answer.access_token;
     return this.access_token;
