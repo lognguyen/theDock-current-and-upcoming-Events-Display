@@ -30,6 +30,9 @@ export class OfficeRnDService {
     }
     );
     const answer: { access_token: string; } = await fetchedData;
+    if (typeof answer.access_token == 'undefined') {
+      console.log(AuthOptions)
+    }
     this.access_token = answer.access_token;
     return this.access_token;
   };
