@@ -20,8 +20,17 @@ export class OfficeRnDService {
     let fetchedData = await fetch(
       'https://identity.officernd.com/oauth/token',
       AuthOptions,
-    );
-    const answer: { access_token: string } = await fetchedData.json();
+    ).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      return response.text().then(text => { throw new Error(text); });
+    })
+      .catch(error => {
+        console.log('Error Fetching Data: ', error);
+      }
+      );
+    const answer: { access_token: string; } = await fetchedData;
     this.access_token = answer.access_token;
     return this.access_token;
   };
@@ -46,7 +55,7 @@ export class OfficeRnDService {
     return (await fetchedData.json()) as T;
   };
 
-  cachedData: Record<string, { data: any; cachingTimestamp: number }> = {};
+  cachedData: Record<string, { data: any; cachingTimestamp: number; }> = {};
   private fetchWithTokenAndCache = async <T extends {}>(
     url: string,
     defaultCacheDuration = DEFAULT_CACHE_TIME_IN_MS,
@@ -67,9 +76,9 @@ export class OfficeRnDService {
   private getEvents = async (dateStart: string, dateEnd: string) => {
     let fetchedData = await this.fetchWithToken<OfficeRndBooking[]>(
       `${this.BASE_API_URL}/bookings?seriesStart.$gte=` +
-        dateStart +
-        '&seriesStart.$lte=' +
-        dateEnd,
+      dateStart +
+      '&seriesStart.$lte=' +
+      dateEnd,
     );
     return fetchedData;
   };

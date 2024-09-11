@@ -11,11 +11,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const date = new Date();
-  if (date.getHours() > 22 || date.getHours() < 5) {
-    // Prevent fetching data
-    res.status(200).json([]);
-  }
-
   const nowDate = date.toLocaleDateString();
   const tomorrowDate = date.toLocaleDateString();
   const officeRNDService = new OfficeRnDService();
@@ -23,9 +18,6 @@ export default async function handler(
     nowDate,
     tomorrowDate,
   );
-  if (events.length == 0) {
-    res.status(200).json([]);
-  }
 
   const todayEvents = events
   .filter((event: any) => {
