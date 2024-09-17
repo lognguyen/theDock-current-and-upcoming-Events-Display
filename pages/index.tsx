@@ -123,7 +123,7 @@ export default function Home() {
             }).format(currentTime)}
           </span>
         </div>
-        <img className='logo' src='theDockLogoSquareColors.png' />
+        <img className='logo' src='theDockLogoSquareColors.png'/>
       </div>
     </div>
   );
