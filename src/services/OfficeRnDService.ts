@@ -24,14 +24,16 @@ export class OfficeRnDService {
       if (response.ok) {
         return response.json();
       }
-      return response.text().then(text => { throw new Error(text); });
+      return response;
     }).catch(error => {
       console.log('Error Fetching Data: ', error);
     }
     );
     const answer: { access_token: string; } = await fetchedData;
-    if (typeof answer.access_token == 'undefined') {
-      console.log(AuthOptions)
+    if (answer.hasOwnProperty('status')) {
+      if (answer.status >= 400) {
+        throw new Error(answer.statusText + AuthOptions.toString())
+      }
     }
     this.access_token = answer.access_token;
     return this.access_token;
@@ -52,7 +54,6 @@ export class OfficeRnDService {
   private fetchWithToken = async <T extends {}>(url: string) => {
     let fetchedData = await this.rawFetchWithToken(url);
     if (fetchedData.status > 400) {
-      console.log(fetchedData)
       throw new Error("Tried to fetch something that doesn't exist. Error Code: " 
         + fetchedData.status + ". Status Text: " + fetchedData.statusText);
     }
