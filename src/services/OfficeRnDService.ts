@@ -52,7 +52,9 @@ export class OfficeRnDService {
   private fetchWithToken = async <T extends {}>(url: string) => {
     let fetchedData = await this.rawFetchWithToken(url);
     if (fetchedData.status > 400) {
-      throw new Error("Tried to fetch something that doesn't exist");
+      console.log(fetchedData)
+      throw new Error("Tried to fetch something that doesn't exist. Error Code: " 
+        + fetchedData.status + ". Status Text: " + fetchedData.statusText);
     }
     return (await fetchedData.json()) as T;
   };
