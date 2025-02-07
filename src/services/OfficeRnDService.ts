@@ -31,7 +31,7 @@ export class OfficeRnDService {
     }
     );
     const answer: { access_token: string; status: number, statusText: string} = await fetchedData;
-    if (answer.hasOwnProperty('status')) {
+    if ('status' in answer) {
       if (answer.status >= 400) {
         throw new Error(answer.statusText + AuthOptions.toString())
       }
