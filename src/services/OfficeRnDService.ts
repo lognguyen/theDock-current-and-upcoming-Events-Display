@@ -30,12 +30,7 @@ export class OfficeRnDService {
       console.log('Error Fetching Data: ', error);
     }
     );
-    const answer: { access_token: string; status: number, statusText: string} = await fetchedData;
-    if ('status' in answer) {
-      if (answer.status >= 400) {
-        throw new Error(answer.statusText + AuthOptions.toString())
-      }
-    }
+    const answer: {access_token: string} = await fetchedData;
     this.access_token = answer.access_token;
     return this.access_token;
   };
