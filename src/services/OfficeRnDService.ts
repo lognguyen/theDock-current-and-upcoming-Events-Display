@@ -22,6 +22,7 @@ export class OfficeRnDService {
       AuthOptions,
     ).then(response => {
       if (response.ok) {
+        console.log(response.json())
         return response.json();
       }
       return response;
@@ -29,7 +30,7 @@ export class OfficeRnDService {
       console.log('Error Fetching Data: ', error);
     }
     );
-    const answer: { access_token: string; } = await fetchedData;
+    const answer: { access_token: string; status: number, statusText: string} = await fetchedData;
     if (answer.hasOwnProperty('status')) {
       if (answer.status >= 400) {
         throw new Error(answer.statusText + AuthOptions.toString())

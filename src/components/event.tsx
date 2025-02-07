@@ -4,11 +4,12 @@ import React, { useEffect, useRef } from 'react';
 
 export default function Event({ event, scrollYes = false, delay = false}: { event: AppBooking, scrollYes: boolean; delay: boolean}) {
   const style = getEventStyle(event);
-  const messageRef = useRef(null);
-  // let scrollFuntion = () => {};
+  const messageRef = useRef<null|HTMLDivElement>(null);
 
   const scrollFuntion = () => {
-    messageRef.current?.scrollIntoView({
+    if (messageRef.current == null) {
+    } else
+    messageRef.current.scrollIntoView({
       behavior: "smooth",
       block: 'center',
       inline: 'nearest'

@@ -1,12 +1,12 @@
 import Event from '@/src/components/event';
 import { AppBooking } from '@/src/services/OfficeRnDTypes/Booking';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren , useState, useEffect } from 'react';
 const TIME_TO_REFRESH = 3000; // 3 seconds refresh
 const TIME_TO_GET_REQUEST = 240000; // 4 minutes refershing token
 
 export default function Home() {
-  const [currentTime, setRealTime] = React.useState(new Date());
-  React.useEffect(() => {
+  const [currentTime, setRealTime] = useState(new Date());
+  useEffect(() => {
     const timeIntervalId = setInterval(function () {
       setRealTime(new Date());
     }, TIME_TO_REFRESH);
@@ -15,12 +15,7 @@ export default function Home() {
     };
   }, []);
 
-  if (!currentTime) {
-    // If encounter event time problems --> stop rendering
-    return null;
-  }
-
-  const [eventData, setEventData] = React.useState({
+  const [eventData, setEventData] = useState({
     started: Array<AppBooking>(),
     upcoming: Array<AppBooking>(),
   });
@@ -33,7 +28,7 @@ export default function Home() {
     }
     fetch('/api/getEvents')
       .then((res) => {
-        if (!res.ok) throw new Error(res.status);
+        if (!res.ok) throw new Error('Error Status: ' + res.status);
         else return res.json();
       })
       .then((apiEventData) => {
@@ -49,7 +44,7 @@ export default function Home() {
       });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const intervalId = setInterval(() => {
       controlledFetchedEvents();
     }, TIME_TO_GET_REQUEST);
