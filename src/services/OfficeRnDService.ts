@@ -20,17 +20,12 @@ export class OfficeRnDService {
     let fetchedData = await fetch(
       'https://identity.officernd.com/oauth/token',
       AuthOptions,
-    ).then(response => {
-      if (response.ok) {
-        console.log(response.json())
-        return response.json();
-      }
-      return response;
-    }).catch(error => {
+    ).then((response) => response.json()
+    ).catch(error => {
       console.log('Error Fetching Data: ', error);
     }
     );
-    const answer: {access_token: string} = await fetchedData;
+    const answer: { access_token: string; } = await fetchedData;
     this.access_token = answer.access_token;
     return this.access_token;
   };
@@ -50,10 +45,9 @@ export class OfficeRnDService {
   private fetchWithToken = async <T extends {}>(url: string) => {
     let fetchedData = await this.rawFetchWithToken(url);
     if (fetchedData.status > 400) {
-      throw new Error("Tried to fetch something that doesn't exist. Error Code: " 
+      throw new Error("Tried to fetch something that doesn't exist. Error Code: "
         + fetchedData.status + ". Status Text: " + fetchedData.statusText
-      + ". More Details: " + JSON.stringify(fetchedData.body));
-      // + ". More Details: " + fetchedData.body.stream);
+        + ". More Details: " + JSON.stringify(fetchedData.body));
     }
     return (await fetchedData.json()) as T;
   };
