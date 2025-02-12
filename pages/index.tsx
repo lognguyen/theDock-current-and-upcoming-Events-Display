@@ -45,12 +45,11 @@ export default function Home() {
   };
 
   useEffect(() => {
+    controlledFetchedEvents(); // First time to fire off instantly
     const intervalId = setInterval(() => {
       controlledFetchedEvents();
     }, TIME_TO_GET_REQUEST);
-    return () => {
-      clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId)
   }, []);
 
   if (!eventData) {
@@ -69,15 +68,15 @@ export default function Home() {
             {eventsHappeningNow.map((event, index) => {
               // TODO: check if isOverflow is correct
               if (eventsHappeningNow.length - 1 === index) {
-                return <Event event={event} key={event._id} scrollYes={true} delay={true} />;
+                return <Event event={event} key={event._id}/>;
               }
               if (eventsComingSoon.length === 0) {
                 if (index === 0) {
-                  return <Event event={event} key={event._id} scrollYes={true} delay={false} />;
+                  return <Event event={event} key={event._id}/>;
                 }
               }
               else {
-                return <Event event={event} key={event._id} scrollYes={false} delay={false} />;
+                return <Event event={event} key={event._id}/>;
               }
             })}
           </div>
@@ -88,14 +87,14 @@ export default function Home() {
               // TODO: check if isOverflow is correct
               if (eventsHappeningNow.length === 0) {
                 if (eventsHappeningNow.length - 1 === index) {
-                  return <Event event={event} key={event._id} scrollYes={true} delay={true} />;
+                  return <Event event={event} key={event._id} />;
                 }
               }
               if (index === 0) {
-                return <Event event={event} key={event._id} scrollYes={true} delay={false} />;
+                return <Event event={event} key={event._id}/>;
               }
               else {
-                return <Event event={event} key={event._id} scrollYes={false} delay={false} />;
+                return <Event event={event} key={event._id}/>;
               }
             })}
           </div>

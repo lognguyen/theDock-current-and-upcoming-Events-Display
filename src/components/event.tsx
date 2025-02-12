@@ -2,19 +2,10 @@ import { COLOR_USAGES } from '../constant/COLOR_USAGES';
 import { AppBooking } from '../services/OfficeRnDTypes/Booking';
 import React, { useEffect, useRef } from 'react';
 
-export default function Event({ event, scrollYes = false, delay = false}: { event: AppBooking, scrollYes: boolean; delay: boolean}) {
+export default function Event({event}: { event: AppBooking}) {
   const style = getEventStyle(event);
   const messageRef = useRef<null|HTMLDivElement>(null);
 
-  const scrollFuntion = () => {
-    if (messageRef.current == null) {
-    } else
-    messageRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: 'center',
-      inline: 'nearest'
-    });
-  };
   const dataToShow = event.summary
     ? {
       title: event.summary,
@@ -24,22 +15,6 @@ export default function Event({ event, scrollYes = false, delay = false}: { even
       title: event.host,
       description: event.summary,
     };
-
-  useEffect(() => {
-    if (delay) {
-      setInterval(()=>{
-        if (scrollYes == true) {
-          scrollFuntion();
-        }
-       }, 12000)
-    } else {
-        if (scrollYes == true) {
-          scrollFuntion();
-        }
-    }
-
-  }, [event]);
-
   return (
     <div ref={messageRef} className='event' style={style}>
       <div className='eventDetails'>
