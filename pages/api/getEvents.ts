@@ -18,18 +18,10 @@ export default async function handler(
   const nowDate = currentDate.toLocaleDateString("fr-CA");
   const tomorrowDate = tomorrow.toLocaleDateString("fr-CA");
 
-  // Padding 0 to time
-  const currentHours = ("0" + currentDate.getHours()).slice(-2);
-  const tomorrowHours = ("0" + tomorrow.getHours()).slice(-2);
-  const currentMinutes = ("0" + currentDate.getMinutes()).slice(-2);
-  const tomorrowMinutes = ("0" + tomorrow.getMinutes()).slice(-2);
-
-  const formattedNowDate = nowDate + "T" + currentHours + ":" + currentMinutes+ ":00.000Z"; // no need for seconds precision
-  const formattedTomorrowDate = tomorrowDate + "T" + tomorrowHours + ":" + tomorrowMinutes + ":00.000Z"; // no need for seconds precision
   const officeRNDService = new OfficeRnDService();
   const events = await officeRNDService.getEventsWithMeetingRoomsAndHostingTeam(
-    formattedNowDate,
-    formattedTomorrowDate,
+    nowDate,
+    tomorrowDate,
   );
 
   const todayEvents = events
