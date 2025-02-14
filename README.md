@@ -49,8 +49,6 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-## Railway current Test Deployement
-
-Currently hosted on Railway. Link: https://thedockscreentesting-production.up.railway.app
-
-
+## Deploy on Railway
+Currently hosted on Railway. Link: https://thedockscreentesting-production.up.railway.app/
+Await for more feedbacks
