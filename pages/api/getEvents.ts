@@ -12,6 +12,8 @@ export default async function handler(
 ) {
   const currentDate = new Date();
   const tomorrow = new Date();
+  // const currentDate = new Date('2025-02-11');
+  // const tomorrow = new Date('2025-02-11');
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   // TODO: Implement correct ISO style
@@ -23,14 +25,17 @@ export default async function handler(
     nowDate,
     tomorrowDate,
   );
+  // console.log(events)
 
   const todayEvents = events
     .filter((event: any) => {
+      // console.log(event.host + ":"+ new Date(event.startDateTime).toLocaleDateString("fr-CA"))
+      // console.log(nowDate)
       return new Date(event.startDateTime).toLocaleDateString("fr-CA") == nowDate;
     });
   const todayEventsSorted = todayEvents.sort(function (a, b) {
     return (
-      new Date(a.startDateTime).getTime() - new Date(b.endDateTime).getTime()
+      (new Date(a.startDateTime).getTime() - new Date(b.endDateTime).getTime()) / 1000
     );
   });
   const eventsToShow = SeparateStartedAndUpcomingEvents(
