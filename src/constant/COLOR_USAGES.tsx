@@ -1,6 +1,6 @@
 const THE_DOCK_COLORS = {
-  BLUE: '#2D85AB',
-  GREEN: '#8BC34A',
+  BLUE: '#0D4A63',
+  GREEN: '#4A7A2A',
   PURPLE: '#794089',
 };
 export const COLOR_USAGES = {
