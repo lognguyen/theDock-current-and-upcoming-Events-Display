@@ -1,6 +1,6 @@
 Reference from: https://github.com/dakirst/dockScreen (This is a group project - I need to be able to deploy code reliably hence this repository)  
 
-## Deploy on Railway
+## Production/Hosting on Railway
 Currently hosted on Railway. Link: https://thedockscreentesting-production.up.railway.app/ 
 This is a NextJs web application using OfficeRND API (Rest) to fetch and display current and upcoming events of the day. Currently available on all the screens at theDock
 
