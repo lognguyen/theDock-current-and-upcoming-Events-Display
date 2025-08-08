@@ -137,12 +137,12 @@ a {
   min-height: 100px;
   align-content: space-between;
   padding: 0.5rem 1.4rem;
-  display: flex;
+  display: block;
   flex-direction: column;
 }
 
 .eventDetails {
-  display: flex;
+  display: block;
   flex-direction: column;
   justify-content: space-between;
   gap: 0.4rem;
