@@ -3,7 +3,7 @@ import { sortEventsByProximityToNow } from '@/src/helpers/sortEventsByProximityT
 import { sortBookingByTimeAsc } from '@/src/helpers/sortEventsByStartTimeAsc';
 import { AppBooking } from '@/src/services/OfficeRnDTypes/Booking';
 import React, { PropsWithChildren, useState, useEffect, useRef } from 'react';
-const TIME_TO_REFRESH = 3000; // 3 seconds refresh
+const TIME_TO_REFRESH = 1000; // 3 seconds refresh
 const TIME_TO_GET_REQUEST = 240000; // 4 minutes refershing token
 
 export default function Home() {
@@ -34,7 +34,11 @@ export default function Home() {
         else return res.json();
       })
       .then((apiEventData) => {
-        if (apiEventData.length == 0) {
+        console.log(apiEventData)
+        console.log('Hello bruv ' + apiEventData.started.length)
+        if (apiEventData.started.length == 0 && apiEventData.upcoming.length === 0) {
+          console.log('No event bruv');
+          
           return;
         }
         setEventData(apiEventData);
