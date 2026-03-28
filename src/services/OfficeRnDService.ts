@@ -83,7 +83,7 @@ export class OfficeRnDService {
 
   private filterCanceledAndTomorrowEvents = (events: OfficeRndBooking[]) => {
     return events.filter((event) => !event.canceled && 
-    (DateTime.fromISO(event.start, {zone: event.timezone})).toISODate() == (DateTime.now().setZone(event.timezone)).toISODate());
+    (DateTime.fromISO(event.start.dateTime, {zone: event.timezone})).toISODate() == (DateTime.now().setZone(event.timezone)).toISODate());
   };
 
   getEventsWithMeetingRoomsAndHostingTeam = async (
