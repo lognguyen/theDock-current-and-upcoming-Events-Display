@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const currentDate = new Date();
+  const currentDate = new Date('2025-06-06');
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -25,9 +25,9 @@ export default async function handler(
   );
   
   const todayEvents = events
-    .filter((event: any) => {
-      return new Date(event.startDateTime).toISOString() == nowDate;
-    });
+    // .filter((event: any) => {
+    //   return new Date(event.startDateTime).toISOString() == nowDate;
+    // });
   const todayEventsSorted = todayEvents.sort(function (a, b) {
     return (
       new Date(a.startDateTime).getTime() - new Date(b.endDateTime).getTime()
