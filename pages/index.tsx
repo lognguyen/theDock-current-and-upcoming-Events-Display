@@ -131,37 +131,43 @@ export default function Home() {
 
 const Section = (props: PropsWithChildren<{ title: string; }>) => {
   const listRef = React.useRef<HTMLDivElement>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
 
-    const scrollHeight = list.scrollHeight;
-    const clientHeight = list.clientHeight;
+    const checkAndScroll = () => {
+      const scrollHeight = list.scrollHeight;
+      const clientHeight = list.clientHeight;
+      const isOverflowing = scrollHeight > clientHeight;
 
-    // Auto scroll every 5 seconds
-    const scrollInterval = setInterval(() => {
-      if (scrollPosition >= scrollHeight - clientHeight) {
+      if (!isOverflowing) return; // No need to scroll if content fits
+
+      const currentScrollTop = list.scrollTop;
+      const maxScrollTop = scrollHeight - clientHeight;
+
+      if (currentScrollTop >= maxScrollTop) {
         // Reset to top when reached bottom
-        setScrollPosition(0);
         list.scrollTo({
           top: 0,
           behavior: 'smooth'
         });
       } else {
-        // Scroll down by 100px
-        const newPosition = scrollPosition + 100;
-        setScrollPosition(newPosition);
+        // Scroll down by the height of one event (approximately)
+        const eventHeight = 120; // Approximate height of an event component
+        const newScrollTop = Math.min(currentScrollTop + eventHeight, maxScrollTop);
         list.scrollTo({
-          top: newPosition,
+          top: newScrollTop,
           behavior: 'smooth'
         });
       }
-    }, 5000);
+    };
+
+    // Auto scroll every 5 seconds
+    const scrollInterval = setInterval(checkAndScroll, 5000);
 
     return () => clearInterval(scrollInterval);
-  }, [scrollPosition]);
+  }, []);
 
   return (
     <section className='event_section'>
