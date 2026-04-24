@@ -2,8 +2,8 @@ import Event from '@/src/components/event';
 import { sortEventsByProximityToNow } from '@/src/helpers/sortEventsByProximityToNow';
 import { sortBookingByTimeAsc } from '@/src/helpers/sortEventsByStartTimeAsc';
 import { AppBooking } from '@/src/services/OfficeRnDTypes/Booking';
-import React, { PropsWithChildren, useState, useEffect } from 'react';
-const TIME_TO_REFRESH = 3000; // 3 seconds refresh
+import React, { PropsWithChildren, useState, useEffect, useRef } from 'react';
+const TIME_TO_REFRESH = 1000; // 3 seconds refresh
 const TIME_TO_GET_REQUEST = 240000; // 4 minutes refershing token
 
 export default function Home() {
@@ -34,7 +34,11 @@ export default function Home() {
         else return res.json();
       })
       .then((apiEventData) => {
-        if (apiEventData.length == 0) {
+        console.log(apiEventData)
+        console.log('Hello bruv ' + apiEventData.started.length)
+        if (apiEventData.started.length == 0 && apiEventData.upcoming.length === 0) {
+          console.log('No event bruv');
+          
           return;
         }
         setEventData(apiEventData);
@@ -126,10 +130,51 @@ export default function Home() {
 }
 
 const Section = (props: PropsWithChildren<{ title: string; }>) => {
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const checkAndScroll = () => {
+      const scrollHeight = list.scrollHeight;
+      const clientHeight = list.clientHeight;
+      const isOverflowing = scrollHeight > clientHeight;
+
+      if (!isOverflowing) return; // No need to scroll if content fits
+
+      const currentScrollTop = list.scrollTop;
+      const maxScrollTop = scrollHeight - clientHeight;
+
+      if (currentScrollTop >= maxScrollTop) {
+        // Reset to top when reached bottom
+        list.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      } else {
+        // Scroll down by the height of one event (approximately)
+        const eventHeight = 120; // Approximate height of an event component
+        const newScrollTop = Math.min(currentScrollTop + eventHeight, maxScrollTop);
+        list.scrollTo({
+          top: newScrollTop,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    // Auto scroll every 5 seconds
+    const scrollInterval = setInterval(checkAndScroll, 5000);
+
+    return () => clearInterval(scrollInterval);
+  }, []);
+
   return (
     <section className='event_section'>
       <SectionTitle>{props.title}</SectionTitle>
-      {props.children}
+      <div className='event_section__list' ref={listRef}>
+        {props.children}
+      </div>
     </section>
   );
 };

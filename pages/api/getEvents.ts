@@ -15,18 +15,18 @@ export default async function handler(
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   // TODO: Implement correct ISO style
-  const nowDate = currentDate.toLocaleDateString("fr-CA");
-  const tomorrowDate = tomorrow.toLocaleDateString("fr-CA");
+  const nowDate = currentDate.toISOString();
+  const tomorrowDate = tomorrow.toISOString();
 
   const officeRNDService = new OfficeRnDService();
   const events = await officeRNDService.getEventsWithMeetingRoomsAndHostingTeam(
     nowDate,
     tomorrowDate,
   );
-
+  
   const todayEvents = events
     .filter((event: any) => {
-      return new Date(event.startDateTime).toLocaleDateString("fr-CA") == nowDate;
+      return new Date(event.startDateTime).toISOString() == nowDate;
     });
   const todayEventsSorted = todayEvents.sort(function (a, b) {
     return (

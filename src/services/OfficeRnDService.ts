@@ -4,6 +4,7 @@ import { OfficeRnDFloor } from './OfficeRnDTypes/Floor';
 import { OfficeRndMeetingRoom } from './OfficeRnDTypes/MeetingRoom';
 import { OfficeRnDMember } from './OfficeRnDTypes/Member';
 import { OfficeRnDTeam } from './OfficeRnDTypes/Team';
+import {DateTime} from 'luxon';
 
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24; // 1 day
 const DEFAULT_CACHE_TIME_IN_MS = 3 * ONE_DAY_IN_MS; // 3days
@@ -80,8 +81,9 @@ export class OfficeRnDService {
     return fetchedData;
   };
 
-  private filterCanceledEvents = (events: OfficeRndBooking[]) => {
-    return events.filter((event) => !event.canceled);
+  private filterCanceledAndTomorrowEvents = (events: OfficeRndBooking[]) => {
+    return events.filter((event) => !event.canceled && 
+    (DateTime.fromISO(event.start.dateTime, {zone: event.timezone})).toISODate() == (DateTime.now().setZone(event.timezone)).toISODate());
   };
 
   getEventsWithMeetingRoomsAndHostingTeam = async (
@@ -91,7 +93,7 @@ export class OfficeRnDService {
     const floors = await this.getFloors();
     const meetingRooms = await this.getMeetingRooms();
     const allEvents = await this.getEvents(dateStart, dateEnd);
-    const events = this.filterCanceledEvents(allEvents);
+    const events = this.filterCanceledAndTomorrowEvents(allEvents);
     const teams = await this.getTeams(events);
     const members = await this.getMembers(events);
     return this.aggregator.combineOfficeRnDDataIntoAppBookings(

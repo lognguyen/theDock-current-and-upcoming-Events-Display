@@ -1,0 +1,26 @@
+.event_section__list {
+  max-height: 40vh; /* Adjust height as needed */
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styling */
+.event_section__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event_section__list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.event_section__list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* For Firefox */
+.event_section__list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.1);
+}
