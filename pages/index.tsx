@@ -83,7 +83,7 @@ export default function Home() {
             })}
           </div>
         </Section>
-        <Section title='Later today'>
+        <Section title='Later'>
           <div className='event_section__list'>
             {eventsComingSoon.map((event, index) => {
               // TODO: check if isOverflow is correct
