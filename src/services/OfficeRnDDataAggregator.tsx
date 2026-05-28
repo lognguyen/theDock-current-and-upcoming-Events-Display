@@ -1,5 +1,5 @@
 import { OfficeRndBooking, AppBooking } from "./OfficeRnDTypes/Booking";
-import { OfficeRnDTeam } from "./OfficeRnDTypes/Team";
+import { OfficeRnDCompany } from "./OfficeRnDTypes/Company";
 import { OfficeRndMeetingRoom } from "./OfficeRnDTypes/MeetingRoom";
 import { OfficeRnDFloor } from "./OfficeRnDTypes/Floor";
 import { keyBy } from "../helpers/keyBy";
@@ -10,28 +10,28 @@ export class OfficeRnDDataAggregator {
     floors: OfficeRnDFloor[],
     meetingRooms: OfficeRndMeetingRoom[],
     events: OfficeRndBooking[],
-    teams: OfficeRnDTeam[],
+    companies: OfficeRnDCompany[],
     members: OfficeRnDMember[],
   ): AppBooking[] => {
     const floorsById = keyBy(floors, '_id');
-    const teamsById = keyBy(teams, '_id');
+    const companiesById = keyBy(companies, '_id');
     const meetingRoomsById = this.combineMeetingRoomsAndFloors(
       floorsById, meetingRooms
     );
     const membersById = keyBy(members, '_id');
     const eventsWithMeetingRooms = events.map((event) => {
-      const meetingRoom = meetingRoomsById[event.resourceId];
-      const team = teamsById[event.team];
-      const member = membersById[event.member];
+      const meetingRoom = meetingRoomsById[event.resource];
+      const company = companiesById[event.company];
+      const member = event.member ? membersById[event.member] : undefined;
       return {
         _id: event._id,
-        summary: event.summary,
-        endDateTime: event.end?.dateTime,
-        startDateTime: event.start?.dateTime,
+        summary: event.title,
+        endDateTime: event.end,
+        startDateTime: event.start,
         timezone: event.timezone,
         room: meetingRoom?.name || '',
         floor: meetingRoom?.floor || '',
-        host: team?.name || member?.name || '',
+        host: company?.name || member?.name || '',
       } as AppBooking;
     });
     return eventsWithMeetingRooms;
@@ -42,7 +42,7 @@ export class OfficeRnDDataAggregator {
     meetingRooms: OfficeRndMeetingRoom[]
   ) => {
     const meetingRoomsWithFloor = meetingRooms.map((meetingRoom) => {
-      const floor = floorsById[meetingRoom.room];
+      const floor = meetingRoom.floor ? floorsById[meetingRoom.floor] : undefined;
       return {
         ...meetingRoom,
         floor: floor?.name || 'no floor',

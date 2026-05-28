@@ -3,13 +3,31 @@ import { AppBooking, OfficeRndBooking } from './OfficeRnDTypes/Booking';
 import { OfficeRnDFloor } from './OfficeRnDTypes/Floor';
 import { OfficeRndMeetingRoom } from './OfficeRnDTypes/MeetingRoom';
 import { OfficeRnDMember } from './OfficeRnDTypes/Member';
-import { OfficeRnDTeam } from './OfficeRnDTypes/Team';
+import { OfficeRnDCompany } from './OfficeRnDTypes/Company';
 import {DateTime} from 'luxon';
 
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24; // 1 day
-const DEFAULT_CACHE_TIME_IN_MS = 3 * ONE_DAY_IN_MS; // 3days
+const DEFAULT_CACHE_TIME_IN_MS = 3 * ONE_DAY_IN_MS; // 3 days
+
+const DEFAULT_SCOPE = [
+  'flex.space.bookings.read',
+  'flex.space.resources.read',
+  'flex.space.floors.read',
+  'flex.community.members.read',
+  'flex.community.companies.read',
+].join(' ');
+
+// v2 list endpoints wrap results in { results: T[] }
+type V2ListResponse<T> = {
+  results: T[];
+  cursorNext?: string;
+  cursorPrev?: string;
+  rangeStart?: number;
+  rangeEnd?: number;
+};
+
 export class OfficeRnDService {
-  BASE_API_URL = 'https://app.officernd.com/api/v1/organizations/thedock';
+  BASE_API_URL = 'https://app.officernd.com/api/v2/organizations/thedock';
   access_token = '';
 
   aggregator = new OfficeRnDDataAggregator();
@@ -18,42 +36,36 @@ export class OfficeRnDService {
     if (this.access_token) {
       return this.access_token;
     }
-    let fetchedData = await fetch(
+    const response = await fetch(
       'https://identity.officernd.com/oauth/token',
       AuthOptions,
-    ).then((response) => response.json()
-    ).catch(error => {
-      console.log('Error Fetching Data: ', error);
-    }
     );
-    const answer: { access_token: string; } = await fetchedData;
-    this.access_token = answer.access_token;
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`OfficeRnD auth failed (${response.status}): ${body}`);
+    }
+    const data: { access_token: string } = await response.json();
+    this.access_token = data.access_token;
     return this.access_token;
   };
 
-  private rawFetchWithToken = async <T extends {}>(url: string) => {
+  private fetchWithToken = async <T extends {}>(url: string) => {
     const token = await this.authenticate();
-    let fetchedData = await fetch(url, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'User-Agent': 'insomnia/2023.5.8',
         Authorization: 'Bearer ' + token,
       },
     });
-    return fetchedData;
-  };
-
-  private fetchWithToken = async <T extends {}>(url: string) => {
-    let fetchedData = await this.rawFetchWithToken(url);
-    if (fetchedData.status > 400) {
-      throw new Error("Tried to fetch something that doesn't exist. Error Code: "
-        + fetchedData.status + ". Status Text: " + fetchedData.statusText
-        + ". More Details: " + JSON.stringify(fetchedData.body));
+    if (!response.ok) {
+      throw new Error(
+        `OfficeRnD API error (${response.status}): ${response.statusText} — ${url}`
+      );
     }
-    return (await fetchedData.json()) as T;
+    return (await response.json()) as T;
   };
 
-  cachedData: Record<string, { data: any; cachingTimestamp: number; }> = {};
+  cachedData: Record<string, { data: any; cachingTimestamp: number }> = {};
   private fetchWithTokenAndCache = async <T extends {}>(
     url: string,
     defaultCacheDuration = DEFAULT_CACHE_TIME_IN_MS,
@@ -72,18 +84,15 @@ export class OfficeRnDService {
   };
 
   private getEvents = async (dateStart: string, dateEnd: string) => {
-    let fetchedData = await this.fetchWithToken<OfficeRndBooking[]>(
-      `${this.BASE_API_URL}/bookings?seriesStart.$gte=` +
-      dateStart +
-      '&seriesStart.$lte=' +
-      dateEnd,
+    const data = await this.fetchWithToken<V2ListResponse<OfficeRndBooking>>(
+      `${this.BASE_API_URL}/bookings?seriesStart[$gte]=${dateStart}&seriesStart[$lte]=${dateEnd}`,
     );
-    return fetchedData;
+    return data.results;
   };
 
   private filterCanceledAndTomorrowEvents = (events: OfficeRndBooking[]) => {
-    return events.filter((event) => !event.canceled && 
-    (DateTime.fromISO(event.start.dateTime, {zone: event.timezone})).toISODate() == (DateTime.now().setZone(event.timezone)).toISODate());
+    return events.filter((event) => !event.isCancelled &&
+    (DateTime.fromISO(event.start, {zone: event.timezone})).toISODate() == (DateTime.now().setZone(event.timezone)).toISODate());
   };
 
   getEventsWithMeetingRoomsAndHostingTeam = async (
@@ -94,43 +103,43 @@ export class OfficeRnDService {
     const meetingRooms = await this.getMeetingRooms();
     const allEvents = await this.getEvents(dateStart, dateEnd);
     const events = this.filterCanceledAndTomorrowEvents(allEvents);
-    const teams = await this.getTeams(events);
+    const companies = await this.getCompanies(events);
     const members = await this.getMembers(events);
     return this.aggregator.combineOfficeRnDDataIntoAppBookings(
       floors,
       meetingRooms,
       events,
-      teams,
+      companies,
       members,
     );
   };
 
   private getMeetingRooms = async () => {
-    let meetingRooms = await this.fetchWithTokenAndCache<
-      OfficeRndMeetingRoom[]
-    >(`${this.BASE_API_URL}/resources?type=meeting_room`);
-    return meetingRooms;
+    const data = await this.fetchWithTokenAndCache<V2ListResponse<OfficeRndMeetingRoom>>(
+      `${this.BASE_API_URL}/resources?type=meeting_room`,
+    );
+    return data.results;
   };
 
   private getFloors = async () => {
-    let floorsArray = await this.fetchWithTokenAndCache<OfficeRnDFloor[]>(
+    const data = await this.fetchWithTokenAndCache<V2ListResponse<OfficeRnDFloor>>(
       `${this.BASE_API_URL}/floors`,
     );
-    return floorsArray;
+    return data.results;
   };
 
-  private getTeams = async (bookings: OfficeRndBooking[]) => {
-    const teamPromises = bookings
-      .filter((booking) => booking.team)
-      .map<Promise<OfficeRnDTeam>>((booking) => {
-        return this.getTeam(booking);
+  private getCompanies = async (bookings: OfficeRndBooking[]) => {
+    const companyPromises = bookings
+      .filter((booking) => booking.company)
+      .map<Promise<OfficeRnDCompany>>((booking) => {
+        return this.getCompany(booking);
       });
-    return Promise.all(teamPromises);
+    return Promise.all(companyPromises);
   };
 
-  private getTeam = (booking: OfficeRndBooking) => {
-    return this.fetchWithTokenAndCache<OfficeRnDTeam>(
-      `${this.BASE_API_URL}/teams/${booking.team}`,
+  private getCompany = (booking: OfficeRndBooking) => {
+    return this.fetchWithTokenAndCache<OfficeRnDCompany>(
+      `${this.BASE_API_URL}/companies/${booking.company}`,
     );
   };
 
@@ -156,12 +165,11 @@ const AuthOptions = {
   method: 'POST',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
-    'User-Agent': 'insomnia/2023.5.8',
   },
   body: new URLSearchParams({
     client_id: process.env.OFFICERND_CLIENT_ID as string,
     client_secret: process.env.OFFICERND_CLIENT_SECRET as string,
     grant_type: 'client_credentials',
-    scope: process.env.OFFICERND_SCOPE || 'officernd.api.read',
+    scope: process.env.OFFICERND_SCOPE || DEFAULT_SCOPE,
   }),
 };
