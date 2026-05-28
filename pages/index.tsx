@@ -67,38 +67,16 @@ export default function Home() {
       <div className='child_section left_section no-scrollbar'>
         <Section title='Happening right now'>
           <div className='event_section__list'>
-            {eventsHappeningNow.map((event, index) => {
-              // TODO: check if isOverflow is correct
-              if (eventsHappeningNow.length - 1 === index) {
-                return <Event event={event} key={event._id} />;
-              }
-              if (eventsComingSoon.length === 0) {
-                if (index === 0) {
-                  return <Event event={event} key={event._id} />;
-                }
-              }
-              else {
-                return <Event event={event} key={event._id} />;
-              }
-            })}
+            {eventsHappeningNow.map((event) => (
+              <Event event={event} key={event._id} />
+            ))}
           </div>
         </Section>
         <Section title='Later'>
           <div className='event_section__list'>
-            {eventsComingSoon.map((event, index) => {
-              // TODO: check if isOverflow is correct
-              if (eventsHappeningNow.length === 0) {
-                if (eventsHappeningNow.length - 1 === index) {
-                  return <Event event={event} key={event._id} />;
-                }
-              }
-              if (index === 0) {
-                return <Event event={event} key={event._id} />;
-              }
-              else {
-                return <Event event={event} key={event._id} />;
-              }
-            })}
+            {eventsComingSoon.map((event) => (
+              <Event event={event} key={event._id} />
+            ))}
           </div>
         </Section>
       </div>
