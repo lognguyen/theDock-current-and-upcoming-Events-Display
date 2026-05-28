@@ -159,9 +159,9 @@ const AuthOptions = {
     'User-Agent': 'insomnia/2023.5.8',
   },
   body: new URLSearchParams({
-    client_id: process.env.client_id as string,
-    client_secret: process.env.client_secret as string,
+    client_id: process.env.OFFICERND_CLIENT_ID as string,
+    client_secret: process.env.OFFICERND_CLIENT_SECRET as string,
     grant_type: 'client_credentials',
-    scope: process.env.scope_sett as string,
+    scope: process.env.OFFICERND_SCOPE as string,
   }),
 };
