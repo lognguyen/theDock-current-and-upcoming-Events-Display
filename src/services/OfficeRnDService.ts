@@ -162,6 +162,6 @@ const AuthOptions = {
     client_id: process.env.OFFICERND_CLIENT_ID as string,
     client_secret: process.env.OFFICERND_CLIENT_SECRET as string,
     grant_type: 'client_credentials',
-    scope: process.env.OFFICERND_SCOPE as string,
+    scope: process.env.OFFICERND_SCOPE || 'officernd.api.read',
   }),
 };
